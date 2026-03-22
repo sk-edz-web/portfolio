@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | Portfolio Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Password Screen */
+    .password-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+    .password-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 2rem;
+      width: 90%;
+      max-width: 380px;
+      box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .password-card h2 {
+      margin-bottom: 1.5rem;
+      color: #1f2f4e;
+    }
+    .password-card input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    .password-card button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #1f2f4e;
+      color: white;
+      border: none;
+      border-radius: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .error-msg {
+      color: #e11d48;
+      font-size: 0.85rem;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Admin Dashboard (hidden until password correct) */
+    .admin-dashboard {
+      display: none;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #1f2b48, #2a3a6e);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .logout-btn {
+      background: #eef2ff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .section {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #1f2f4e;
+      padding-left: 0.8rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.8rem;
+      font-family: inherit;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    button {
+      background: #1f2f4e;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #0f1f38;
+    }
+    .cards-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .card-item-admin {
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .card-item-admin img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 0.8rem;
+      background: #e2e8f0;
+    }
+    .card-item-admin h3 {
+      font-size: 1.1rem;
+    }
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .card-actions button {
+      flex: 1;
+      padding: 0.4rem;
+      font-size: 0.8rem;
+    }
+    .delete-btn {
+      background: #e11d48;
+    }
+    .delete-btn:hover {
+      background: #be123c;
+    }
+    .edit-btn {
+      background: #2c3e66;
+    }
+    .image-preview {
+      max-width: 150px;
+      margin-top: 0.5rem;
+      border-radius: 0.5rem;
+    }
+    hr {
+      margin: 1rem 0;
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+    @media (max-width: 640px) {
+      body { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Password Screen (no email, just password) -->
+  <div id="passwordScreen" class="password-screen">
+    <div class="password-card">
+      <h2>Admin Access</h2>
+      <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="off">
+      <div id="passwordError" class="error-msg"></div>
+      <button id="unlockBtn">Unlock</button>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard (hidden until password correct) -->
+  <div id="adminDashboard" class="admin-dashboard">
+    <header>
+      <h1>✨ Portfolio Admin Panel</h1>
+      <button id="logoutBtn" class="logout-btn">Lock</button>
+    </header>
+
+    <!-- Profile Section -->
+    <div class="section">
+      <h2>Profile Settings</h2>
+      <form id="profileForm">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="profileName" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label>Bio</label>
+          <textarea id="profileBio" placeholder="Short bio..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Profile Image</label>
+          <input type="file" id="profileImageFile" accept="image/*">
+          <div id="profileImagePreview"></div>
+          <small>Or enter image URL</small>
+          <input type="text" id="profileImageUrl" placeholder="https://...">
+        </div>
+        <button type="submit">Update Profile</button>
+      </form>
+    </div>
+
+    <!-- Add Card Section -->
+    <div class="section">
+      <h2>Add New Card</h2>
+      <form id="addCardForm">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="cardTitle" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="cardDescription" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Image</label>
+          <input type="file" id="cardImageFile" accept="image/*">
+          <div id="cardImagePreview"></div>
+          <small>Or image URL</small>
+          <input type="text" id="cardImageUrl" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>Open Link (URL or file link)</label>
+          <input type="text" id="cardLink" placeholder="https://... or /file.pdf">
+        </div>
+        <button type="submit">Add Card</button>
+      </form>
+    </div>
+
+    <!-- Existing Cards -->
+    <div class="section">
+      <h2>Manage Cards</h2>
+      <div id="cardsList" class="cards-list">Loading cards...</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA1rIPi-HJmBMSfkuP87DGIZPsDPHqf7A4",
+    authDomain: "skedz-f5826.firebaseapp.com",
+    databaseURL: "https://skedz-f5826-default-rtdb.firebaseio.com",
+    projectId: "skedz-f5826",
+    storageBucket: "skedz-f5826.firebasestorage.app",
+    messagingSenderId: "62715657946",
+    appId: "1:62715657946:web:96f1fa87e1584023226fe3",
+    measurementId: "G-MZJ1SWEHD6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // DOM elements
+  const passwordScreen = document.getElementById('passwordScreen');
+  const adminDashboard = document.getElementById('adminDashboard');
+  const passwordInput = document.getElementById('passwordInput');
+  const passwordError = document.getElementById('passwordError');
+  const unlockBtn = document.getElementById('unlockBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  // Profile form
+  const profileForm = document.getElementById('profileForm');
+  const profileNameInput = document.getElementById('profileName');
+  const profileBioInput = document.getElementById('profileBio');
+  const profileImageFile = document.getElementById('profileImageFile');
+  const profileImageUrl = document.getElementById('profileImageUrl');
+  const profileImagePreview = document.getElementById('profileImagePreview');
+
+  // Add card form
+  const addCardForm = document.getElementById('addCardForm');
+  const cardTitle = document.getElementById('cardTitle');
+  const cardDescription = document.getElementById('cardDescription');
+  const cardImageFile = document.getElementById('cardImageFile');
+  const cardImageUrl = document.getElementById('cardImageUrl');
+  const cardLink = document.getElementById('cardLink');
+  const cardImagePreview = document.getElementById('cardImagePreview');
+
+  const cardsListDiv = document.getElementById('cardsList');
+
+  let editingCardId = null;
+
+  // Hardcoded password
+  const ADMIN_PASSWORD = "5023";
+
+  // Unlock with password
+  function unlock(password) {
+    if (password === ADMIN_PASSWORD) {
+      passwordScreen.style.display = 'none';
+      adminDashboard.style.display = 'block';
+      loadProfile();
+      loadCards();
+      passwordInput.value = '';
+      passwordError.textContent = '';
+    } else {
+      passwordError.textContent = 'Incorrect password';
+    }
+  }
+
+  unlockBtn.addEventListener('click', () => {
+    unlock(passwordInput.value);
+  });
+  passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') unlock(passwordInput.value);
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    adminDashboard.style.display = 'none';
+    passwordScreen.style.display = 'flex';
+    editingCardId = null;
+    addCardForm.querySelector('button').textContent = 'Add Card';
+    // reset forms
+    resetAddForm();
+  });
+
+  // Helper: upload image to Firebase Storage
+  async function uploadImage(file, path) {
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+  }
+
+  // Load profile data
+  async function loadProfile() {
+    try {
+      const profileDocRef = doc(db, "profile", "profile");
+      const docSnap = await getDoc(profileDocRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        profileNameInput.value = data.name || '';
+        profileBioInput.value = data.bio || '';
+        profileImageUrl.value = data.avatarUrl || '';
+        if (data.avatarUrl) {
+          profileImagePreview.innerHTML = `<img src="${data.avatarUrl}" class="image-preview" style="max-width:100px">`;
+        } else {
+          profileImagePreview.innerHTML = '';
+        }
+      } else {
+        // Create default profile
+        await setDoc(profileDocRef, { name: "Portfolio Owner", bio: "Creative showcase", avatarUrl: "" });
+        profileNameInput.value = "Portfolio Owner";
+        profileBioInput.value = "Creative showcase";
+      }
+    } catch (err) {
+      console.error("Error loading profile:", err);
+    }
+  }
+
+  // Save profile
+  profileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let imageUrl = profileImageUrl.value.trim();
+    if (profileImageFile.files.length > 0) {
+      const file = profileImageFile.files[0];
+      const path = `profile/${Date.now()}_${file.name}`;
+      try {
+        imageUrl = await uploadImage(file, path);
+        profileImageUrl.value = imageUrl;
+      } catch (err) {
+        alert("Image upload failed: " + err.message);
+        return;
+      }
+    }
+    const profileData = {
+      name: profileNameInput.value,
+      bio: profileBioInput.value,
+      avatarUrl: imageUrl
+    };
+    try {
+      await setDoc(doc(db, "profile", "profile"), profileData);
+      alert("Profile updated!");
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  });
+
+  // Load cards list
+  async function loadCards() {
+    cardsListDiv.innerHTML = '<div class="loading">Loading cards...</div>';
+    try {
+      const querySnapshot = await getDocs(collection(db, "cards"));
+      const cards = [];
+      querySnapshot.forEach(doc => {
+        cards.push({ id: doc.id, ...doc.data() });
+      });
+      if (cards.length === 0) {
+        cardsListDiv.innerHTML = '<p>No cards yet. Add one above.</p>';
+        return;
+      }
+      cardsListDiv.innerHTML = '';
+      cards.forEach(card => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card-item-admin';
+        cardDiv.innerHTML = `
+          <img src="${card.imageUrl || 'https://placehold.co/400x200/eef2ff/2c3e66?text=No+Image'}" onerror="this.src='https://placehold.co/400x200/eef2ff/2c3e66?text=Image+missing'">
+          <h3>${escapeHtml(card.title)}</h3>
+          <p>${escapeHtml(card.description.substring(0, 80))}${card.description.length > 80 ? '...' : ''}</p>
+          <div class="card-actions">
+            <button class="edit-btn" data-id="${card.id}">Edit</button>
+            <button class="delete-btn" data-id="${card.id}">Delete</button>
+          </div>
+        `;
+        cardsListDiv.appendChild(cardDiv);
+      });
+      // attach edit/delete events
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = btn.getAttribute('data-id');
+          editCard(id);
+        });
+      });
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = btn.getAttribute('data-id');
+          if (confirm("Delete this card?")) {
+            await deleteDoc(doc(db, "cards", id));
+            loadCards();
+          }
+        });
+      });
+    } catch (err) {
+      cardsListDiv.innerHTML = `<p>Error loading cards: ${err.message}</p>`;
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // Edit card: populate form and update
+  async function editCard(id) {
+    const docRef = doc(db, "cards", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      cardTitle.value = data.title || '';
+      cardDescription.value = data.description || '';
+      cardImageUrl.value = data.imageUrl || '';
+      cardLink.value = data.linkUrl || '#';
+      editingCardId = id;
+      addCardForm.querySelector('button').textContent = 'Update Card';
+      if (data.imageUrl) {
+        cardImagePreview.innerHTML = `<img src="${data.imageUrl}" class="image-preview" style="max-width:100px">`;
+      } else {
+        cardImagePreview.innerHTML = '';
+      }
+      window.scrollTo({ top: addCardForm.offsetTop - 20, behavior: 'smooth' });
+    }
+  }
+
+  // Reset add card form
+  function resetAddForm() {
+    editingCardId = null;
+    addCardForm.querySelector('button').textContent = 'Add Card';
+    cardTitle.value = '';
+    cardDescription.value = '';
+    cardImageUrl.value = '';
+    cardLink.value = '';
+    cardImageFile.value = '';
+    cardImagePreview.innerHTML = '';
+  }
+
+  // Add or Update card
+  addCardForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let imageUrl = cardImageUrl.value.trim();
+    if (cardImageFile.files.length > 0) {
+      const file = cardImageFile.files[0];
+      const path = `cards/${Date.now()}_${file.name}`;
+      try {
+        imageUrl = await uploadImage(file, path);
+        cardImageUrl.value = imageUrl;
+      } catch (err) {
+        alert("Image upload failed: " + err.message);
+        return;
+      }
+    }
+    const cardData = {
+      title: cardTitle.value,
+      description: cardDescription.value,
+      imageUrl: imageUrl,
+      linkUrl: cardLink.value || "#"
+    };
+    try {
+      if (editingCardId) {
+        await updateDoc(doc(db, "cards", editingCardId), cardData);
+        alert("Card updated!");
+        editingCardId = null;
+        addCardForm.querySelector('button').textContent = 'Add Card';
+      } else {
+        await addDoc(collection(db, "cards"), cardData);
+        alert("Card added!");
+      }
+      resetAddForm();
+      loadCards();
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  });
+
+  // Preview images on file selection
+  profileImageFile.addEventListener('change', (e) => {
+    if (e.target.files.length) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        profileImagePreview.innerHTML = `<img src="${ev.target.result}" class="image-preview" style="max-width:100px">`;
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    } else {
+      profileImagePreview.innerHTML = '';
+    }
+  });
+  cardImageFile.addEventListener('change', (e) => {
+    if (e.target.files.length) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        cardImagePreview.innerHTML = `<img src="${ev.target.result}" class="image-preview" style="max-width:100px">`;
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    } else {
+      cardImagePreview.innerHTML = '';
+    }
+  });
+
+  // If already logged in? Not persistent, always start locked.
+  // Ensure screen is correct
+  passwordScreen.style.display = 'flex';
+  adminDashboard.style.display = 'none';
+</script>
+</body>
+</html>
