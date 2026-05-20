@@ -1,0 +1,137 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Professional Light Theme - Clean & Minimal */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.15 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.35 0.05 250);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.96 0.005 250);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.94 0.01 250);
+  --accent-foreground: oklch(0.2 0 0);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.92 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.35 0.05 250);
+  --radius: 0.75rem;
+  
+  /* Custom Portfolio Colors */
+  --portfolio-gradient-start: oklch(0.35 0.05 250);
+  --portfolio-gradient-end: oklch(0.45 0.08 280);
+  --portfolio-surface: oklch(0.98 0.002 250);
+  --portfolio-hover: oklch(0.96 0.005 250);
+}
+
+.dark {
+  /* Professional Dark Theme */
+  --background: oklch(0.12 0.01 250);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.16 0.01 250);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.16 0.01 250);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.7 0.1 250);
+  --primary-foreground: oklch(0.12 0.01 250);
+  --secondary: oklch(0.22 0.01 250);
+  --secondary-foreground: oklch(0.95 0 0);
+  --muted: oklch(0.22 0.01 250);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.25 0.02 250);
+  --accent-foreground: oklch(0.95 0 0);
+  --destructive: oklch(0.45 0.18 25);
+  --destructive-foreground: oklch(0.95 0 0);
+  --border: oklch(0.25 0.01 250);
+  --input: oklch(0.25 0.01 250);
+  --ring: oklch(0.7 0.1 250);
+  
+  /* Custom Portfolio Colors Dark */
+  --portfolio-gradient-start: oklch(0.5 0.1 250);
+  --portfolio-gradient-end: oklch(0.6 0.12 280);
+  --portfolio-surface: oklch(0.18 0.01 250);
+  --portfolio-hover: oklch(0.22 0.015 250);
+}
+
+@theme inline {
+  --font-sans: 'Inter', 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  /* Smooth transitions for theme change */
+  .theme-transition {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  /* Glass effect */
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  /* Hide scrollbar but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Animation delays */
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+}
